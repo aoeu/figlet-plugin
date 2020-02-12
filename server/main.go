@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -34,8 +35,8 @@ func (f *FIGlet) OnActivate() error {
 		DisplayName:      "FIGlet",
 		Description:      description,
 		AutoComplete:     true,
-		AutoCompleteDesc: "/figlet optionalFontName this text will be printed in large letters",
-		AutoCompleteHint: "[fontname] text",
+		AutoCompleteDesc: "/figlet optionalFontName this text will be printed in large letters, or type /figlet fonts",
+		AutoCompleteHint: "[fonts|list|help] [fontname] text",
 	}
 	if err := f.API.RegisterCommand(c); err != nil {
 		return fmt.Errorf("could not initialize FIGlet plugin due to error: %v", err)
@@ -65,36 +66,81 @@ func (f *FIGlet) init() error {
 // it, and the transformed text is posted back to the mattermost server in
 // the same channel in which this plugin was invoked.
 func (f *FIGlet) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
-	// TODO(aoeu): Token authentication.
-	t, err := f.transformText(args.Command)
-	if err != nil {
-		return nil, &model.AppError{
-			DetailedError: err.Error(),
-		}
+	emptyResp := &model.CommandResponse{
+		TriggerId: args.TriggerId,
 	}
-	return &model.CommandResponse{
-		Text:         t,
-		Username:     args.UserId,
-		ChannelId:    args.ChannelId,
-		TriggerId:    args.TriggerId,
-		ResponseType: "in_channel", // ResponseType is Required.
-	}, nil
+
+	action, option, text, err := parse(args.Command)
+	if err != nil {
+		return emptyResp, app(err)
+	}
+	switch action {
+	case unknown:
+		if err != nil {
+			err := fmt.Errorf("unknown action parsed from command: %v", args.Command)
+			return emptyResp, app(err)
+		}
+	case transform:
+		t, err := f.transformText(text, option)
+		if err != nil {
+			return emptyResp, app(err)
+		}
+		return &model.CommandResponse{
+			Text:         t,
+			Username:     args.UserId,
+			ChannelId:    args.ChannelId,
+			TriggerId:    args.TriggerId,
+			ResponseType: "in_channel", // ResponseType is Required.
+		}, nil
+	case listFonts:
+		f.API.SendEphemeralPost(args.UserId, &model.Post{
+			ChannelId: args.ChannelId,
+			Message:   markdownify(description),
+			Props: map[string]interface{}{
+				"sent_by_plugin": true,
+			},
+		})
+	}
+	return emptyResp, nil
 }
 
-func (f FIGlet) transformText(in string) (out string, err error) {
-	s := strings.Fields(in)
-	if len(s) < 2 {
+func app(err error) *model.AppError {
+	return &model.AppError{DetailedError: err.Error()}
+}
+
+func parse(in string) (a action, option string, text string, err error) {
+	fields := strings.Fields(in)
+	if len(fields) < 2 {
 		s := "no additional text provided to transform in '%v'"
-		return "", fmt.Errorf(s, in)
+		return unknown, "", "", fmt.Errorf(s, fields)
 	}
 	in = strings.Replace(in, "/figlet", "", 1)
 	in = strings.TrimSpace(in)
-	font := strings.ToLower(s[1])
+	option = strings.ToLower(fields[1])
+	switch option {
+	case "list", "help", "fonts":
+		return listFonts, "", "", nil
+	}
+	if fontNames[option] {
+		return transform, option, in, nil
+	}
+	return transform, "", in, nil
+}
+
+type action string
+
+const (
+	transform = "transformText"
+	listFonts = "listFonts"
+	unknown   = "unknown"
+)
+
+func (f FIGlet) transformText(in, optionalFontName string) (out string, err error) {
 	var cmd *exec.Cmd
-	if fontNames[font] {
-		s := strings.Replace(in, font, "", 1)
+	if fontNames[optionalFontName] {
+		s := strings.Replace(in, optionalFontName, "", 1)
 		s = strings.TrimSpace(s)
-		cmd = exec.Command(f.binaryPath, "-d", f.fontsPath, "-f", font, s)
+		cmd = exec.Command(f.binaryPath, "-d", f.fontsPath, "-f", optionalFontName, s)
 	} else {
 		cmd = exec.Command(f.binaryPath, "-d", f.fontsPath, in)
 	}
@@ -104,8 +150,14 @@ func (f FIGlet) transformText(in string) (out string, err error) {
 		s := "error occured when running FIGlet and reading output '%v': %v"
 		return "", fmt.Errorf(s, string(b), err)
 	}
-	markdownProof := strings.Replace(string(b), "`", "'", -1)
-	return "```\n" + markdownProof + "```\n", nil
+	return markdownify(string(b)), nil
+}
+
+var re = regexp.MustCompile("^```$")
+
+func markdownify(plaintext string) (markdown string) {
+	markdown = re.ReplaceAllLiteralString(plaintext, "'''")
+	return "```\n" + markdown + "```\n"
 }
 
 var fontNames = map[string]bool{

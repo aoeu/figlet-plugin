@@ -15,7 +15,7 @@ const manifestStr = `
   "id": "figlet",
   "name": "FIGlet",
   "description": "This plugin ransforms provided text by the FIGlet binary and prints it",
-  "version": "0.0.1",
+  "version": "0.0.7",
   "min_server_version": "5.12.0",
   "server": {
     "executables": {
