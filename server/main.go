@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/mattermost/mattermost-server/v5/plugin"
@@ -40,8 +41,8 @@ func (f *FIGlet) OnActivate() error {
 		DisplayName:      "FIGlet",
 		Description:      description,
 		AutoComplete:     true,
-		AutoCompleteDesc: "/figlet this text will be printed in large letters",
-		AutoCompleteHint: "[text]",
+		AutoCompleteDesc: "/figlet optionalFontName this text will be printed in large letters",
+		AutoCompleteHint: "[fontname] text",
 	}
 	if err := f.API.RegisterCommand(c); err != nil {
 		return fmt.Errorf("could not initialize FIGlet plugin due to error: %v", err)
@@ -88,13 +89,43 @@ func (f *FIGlet) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 }
 
 func (f FIGlet) transformText(in string) (out string, err error) {
-	cmd := exec.Command(f.binaryPath, "-d", f.fontsPath, in)
+	s := strings.Fields(in)
+	font := strings.ToLower(s[0])
+	var cmd *exec.Cmd
+	if fontNames[font] {
+		s := strings.Replace(in, font, "", 1)
+		s = strings.TrimSpace(s)
+		cmd = exec.Command(f.binaryPath, "-d", f.fontsPath, "-f", font, s)
+	} else {
+		cmd = exec.Command(f.binaryPath, "-d", f.fontsPath, in)
+	}
 	cmd.Stdin = os.Stdin
 	b, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("could not run and read output of FIGlet: %v", err)
 	}
 	return string(b), nil
+}
+
+var fontNames = map[string]bool{
+	"banner":    true,
+	"big":       true,
+	"black":     true,
+	"block":     true,
+	"bubble":    true,
+	"digital":   true,
+	"ivrit":     true,
+	"lean":      true,
+	"mini":      true,
+	"mnemonic":  true,
+	"script":    true,
+	"shadow":    true,
+	"slant":     true,
+	"small":     true,
+	"smscript":  true,
+	"smshadown": true,
+	"smslant":   true,
+	"standard":  true,
 }
 
 const description = `FIGlet is a program for making large letters out of ordinary text
@@ -113,4 +144,145 @@ d88' '88b '888""8P      888    888P"Y88b  '888  d88(  "8
 888   888  888          888    888   888   888  '"Y88b.
 888   888  888          888 .  888   888   888  o.  )88b
 'Y8bod8P' d888b         "888" o888o o888o o888o 8""888P'
+
+
+with the following named fonts:
+
+banner :
+
+#####    ##   #    # #    # ###### #####
+#    #  #  #  ##   # ##   # #      #    #
+#####  #    # # #  # # #  # #####  #    #
+#    # ###### #  # # #  # # #      #####
+#    # #    # #   ## #   ## #      #   #
+#####  #    # #    # #    # ###### #    #
+
+
+
+big :
+ _     _
+| |   (_)
+| |__  _  __ _
+| '_ \| |/ _' |
+| |_) | | (_| |
+|_.__/|_|\__, |
+          __/ |
+         |___/
+
+
+block :
+
+_|        _|                      _|
+_|_|_|    _|    _|_|      _|_|_|  _|  _|
+_|    _|  _|  _|    _|  _|        _|_|
+_|    _|  _|  _|    _|  _|        _|  _|
+_|_|_|    _|    _|_|      _|_|_|  _|    _|
+
+
+
+
+bubble :
+  _   _   _   _   _   _
+ / \ / \ / \ / \ / \ / \
+( b | u | b | b | l | e )
+ \_/ \_/ \_/ \_/ \_/ \_/
+
+
+digital :
++-+-+-+-+-+-+-+
+|d|i|g|i|t|a|l|
++-+-+-+-+-+-+-+
+
+
+ivrit :
+                                                            _   _            _
+                                                           | |_(_)_ ____   _(_)
+                                                           | __| | '__\ \ / / |
+                                                           | |_| | |   \ V /| |
+                                                            \__|_|_|    \_/ |_|
+
+
+
+lean :
+
+    _/
+   _/    _/_/      _/_/_/  _/_/_/
+  _/  _/_/_/_/  _/    _/  _/    _/
+ _/  _/        _/    _/  _/    _/
+_/    _/_/_/    _/_/_/  _/    _/
+
+
+
+
+mini :
+
+._ _ o._ o
+| | ||| ||
+
+
+script :
+
+               o
+ ,   __   ,_        _ _|_
+/ \_/    /  |  |  |/ \_|
+ \/ \___/   |_/|_/|__/ |_/
+                 /|
+                 \|
+
+
+shadow :
+      |               |
+  __| __ \   _' |  _' |  _ \\ \  \   /
+\__ \ | | | (   | (   | (   |\ \  \ /
+____/_| |_|\__,_|\__,_|\___/  \_/\_/
+
+
+
+slant :
+         __            __
+   _____/ /___ _____  / /_
+  / ___/ / __ '/ __ \/ __/
+ (__  ) / /_/ / / / / /_
+/____/_/\__,_/_/ /_/\__/
+
+
+
+small :
+               _ _
+ ____ __  __ _| | |
+(_-< '  \/ _' | | |
+/__/_|_|_\__,_|_|_|
+
+
+
+smscript :
+
+ ,           ,   _   ,_  o    _|_
+/ \_/|/|/|  / \_/   /  | | |/\_|
+ \/  | | |_/ \/ \__/   |/|/|_/ |_/
+                          (|
+
+
+smshadow :
+               |              |
+(_-<  ' \ (_-<   \   _' |  _' |  _ \\ \  \ /
+___/_|_|_|___/_| _|\__,_|\__,_|\___/ \_/\_/
+
+
+
+smslant :
+                 __          __
+  ___ __ _  ___ / /__ ____  / /_
+ (_-</  ' \(_-</ / _ '/ _ \/ __/
+/___/_/_/_/___/_/\_,_/_//_/\__/
+
+
+
+standard :
+     _                  _               _
+ ___| |_ __ _ _ __   __| | __ _ _ __ __| |
+/ __| __/ _' | '_ \ / _' |/ _' | '__/ _' |
+\__ \ || (_| | | | | (_| | (_| | | | (_| |
+|___/\__\__,_|_| |_|\__,_|\__,_|_|  \__,_|
+
 `
