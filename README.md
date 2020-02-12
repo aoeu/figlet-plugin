@@ -1,6 +1,9 @@
 
 figlet-plugin is a Mattermost plugin for altering text via [FIGlet](https://en.wikipedia.org/wiki/FIGlet).
 
+This plugin is self-contained and uses the actual FIGlet binary, built from the official distribution on Linux with x86 architecture.  
+*Note that this means the plugin will only work if your Mattermost server is also running Linux with x86.*
+
 ```
 usage: /figlet [list|help|fonts] [font name] text
 ```
