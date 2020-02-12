@@ -87,7 +87,6 @@ func (f *FIGlet) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		}
 		return &model.CommandResponse{
 			Text:         t,
-			Username:     args.UserId,
 			ChannelId:    args.ChannelId,
 			TriggerId:    args.TriggerId,
 			ResponseType: "in_channel", // ResponseType is Required.
