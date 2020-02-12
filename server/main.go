@@ -19,13 +19,6 @@ type FIGlet struct {
 	fontsPath  string
 }
 
-const (
-	triggerWord = "figlet"
-	botID       = "unknown"
-	token       = "unknown"
-	pluginURL   = "https://shouting.online/figlet"
-)
-
 func main() {
 	plugin.ClientMain(&FIGlet{})
 }
@@ -37,7 +30,7 @@ func (f *FIGlet) OnActivate() error {
 		return fmt.Errorf("could not init FIGlet state upon plugin activation: %v", err)
 	}
 	c := &model.Command{
-		Trigger:          triggerWord,
+		Trigger:          "figlet",
 		DisplayName:      "FIGlet",
 		Description:      description,
 		AutoComplete:     true,
@@ -80,8 +73,8 @@ func (f *FIGlet) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		}
 	}
 	return &model.CommandResponse{
-		Username:     botID,
 		Text:         t,
+		Username:     args.UserId,
 		ChannelId:    args.ChannelId,
 		TriggerId:    args.TriggerId,
 		ResponseType: "in_channel", // ResponseType is Required.
