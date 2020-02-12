@@ -140,9 +140,9 @@ func (f FIGlet) transformText(in, optionalFontName string) (out string, err erro
 	if fontNames[optionalFontName] {
 		s := strings.Replace(in, optionalFontName, "", 1)
 		s = strings.TrimSpace(s)
-		cmd = exec.Command(f.binaryPath, "-d", f.fontsPath, "-f", optionalFontName, s)
+		cmd = exec.Command(f.binaryPath, "-w", "160", "-d", f.fontsPath, "-f", optionalFontName, s)
 	} else {
-		cmd = exec.Command(f.binaryPath, "-d", f.fontsPath, in)
+		cmd = exec.Command(f.binaryPath, "-w", "160", "-d", f.fontsPath, in)
 	}
 	cmd.Stdin = os.Stdin
 	b, err := cmd.CombinedOutput()
