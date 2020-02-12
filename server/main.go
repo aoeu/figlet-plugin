@@ -104,7 +104,8 @@ func (f FIGlet) transformText(in string) (out string, err error) {
 		s := "error occured when running FIGlet and reading output '%v': %v"
 		return "", fmt.Errorf(s, string(b), err)
 	}
-	return string(b), nil
+	markdownProof := strings.Replace(string(b), "`", "'", -1)
+	return markdownProof, nil
 }
 
 var fontNames = map[string]bool{
