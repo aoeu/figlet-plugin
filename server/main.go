@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -27,24 +26,30 @@ const (
 )
 
 func main() {
-	f := &FIGlet{}
-	if err := f.init(); err != nil {
-		log.Fatal("could not complete main function due to error:", err)
-	}
-	plugin.ClientMain(f)
+	plugin.ClientMain(&FIGlet{})
 }
 
-func (f *FIGlet) init() error {
-	// TODO(aoeu): What fields are needed in the Command struct? The godoc doesn't specify.
+// OnActivate is a function from the mattermost plugin framework that is called
+// automatically once the plugin has loaded.
+func (f *FIGlet) OnActivate() error {
+	if err := f.init(); err != nil {
+		return fmt.Errorf("could not init FIGlet state upon plugin activation: %v", err)
+	}
 	c := &model.Command{
-		Trigger: triggerWord,
-		Token:   token,     // TODO(aoeu): Is this needed here?
-		URL:     pluginURL, // TODO(aoeu): Is this needed here?
+		Trigger:          triggerWord,
+		DisplayName:      "FIGlet",
+		Description:      description,
+		AutoComplete:     true,
+		AutoCompleteDesc: "/figlet this text will be printed in large letters",
+		AutoCompleteHint: "[text]",
 	}
 	if err := f.API.RegisterCommand(c); err != nil {
 		return fmt.Errorf("could not initialize FIGlet plugin due to error: %v", err)
 	}
+	return nil
+}
 
+func (f *FIGlet) init() error {
 	bundlePath, err := f.API.GetBundlePath()
 	if err != nil {
 		return fmt.Errorf("could not initialize FIGlet plugin with bundle path: %v", err)
@@ -59,7 +64,6 @@ func (f *FIGlet) init() error {
 	if err != nil {
 		return fmt.Errorf("could not initialize FIGlet plugin with fonts path: %v", err)
 	}
-
 	return nil
 }
 
@@ -92,3 +96,21 @@ func (f FIGlet) transformText(in string) (out string, err error) {
 	}
 	return string(b), nil
 }
+
+const description = `FIGlet is a program for making large letters out of ordinary text
+
+ _ _ _          _   _     _
+| (_) | _____  | |_| |__ (_)___
+| | | |/ / _ \ | __|  _ \| / __|
+| | |   <  __/ | |_| | | | \__ \
+|_|_|_|\_\___|  \__|_| |_|_|___/
+
+
+                          .   oooo         o8o
+                        .o8   '888         '"'
+ .ooooo.  oooo d8b    .o888oo  888 .oo.   oooo   .oooo.o
+d88' '88b '888""8P      888    888P"Y88b  '888  d88(  "8
+888   888  888          888    888   888   888  '"Y88b.
+888   888  888          888 .  888   888   888  o.  )88b
+'Y8bod8P' d888b         "888" o888o o888o o888o 8""888P'
+`
