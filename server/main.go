@@ -19,7 +19,12 @@ type FIGlet struct {
 	fontsPath  string
 }
 
-const triggerWord = "figlet"
+const (
+	triggerWord = "figlet"
+	botID       = "unknown"
+	token       = "unknown"
+	pluginURL   = "https://shouting.online/figlet"
+)
 
 func main() {
 	f := &FIGlet{}
@@ -31,7 +36,11 @@ func main() {
 
 func (f *FIGlet) init() error {
 	// TODO(aoeu): What fields are needed in the Command struct? The godoc doesn't specify.
-	c := &model.Command{Trigger: triggerWord}
+	c := &model.Command{
+		Trigger: triggerWord,
+		Token:   token,     // TODO(aoeu): Is this needed here?
+		URL:     pluginURL, // TODO(aoeu): Is this needed here?
+	}
 	if err := f.API.RegisterCommand(c); err != nil {
 		return fmt.Errorf("could not initialize FIGlet plugin due to error: %v", err)
 	}
