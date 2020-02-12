@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -52,14 +54,12 @@ func (f *FIGlet) init() error {
 	return nil
 }
 
-const botID = "unknown"
-
 // ExecuteCommand runs the FIGlet binary on the provided text to transform
 // it, and the transformed text is posted back to the mattermost server in
 // the same channel in which this plugin was invoked.
 func (f *FIGlet) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
 	// TODO(aoeu): Token authentication.
-	t, err := transformText(args.Command)
+	t, err := f.transformText(args.Command)
 	if err != nil {
 		return nil, &model.AppError{
 			DetailedError: err.Error(),
@@ -74,6 +74,12 @@ func (f *FIGlet) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 	}, nil
 }
 
-func transformText(in string) (out string, err error) {
-	return "", nil // TODO(aoeu): Implement functionality.
+func (f FIGlet) transformText(in string) (out string, err error) {
+	cmd := exec.Command(f.binaryPath, "-d", f.fontsPath, in)
+	cmd.Stdin = os.Stdin
+	b, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("could not run and read output of FIGlet: %v", err)
+	}
+	return string(b), nil
 }
