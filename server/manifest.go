@@ -12,10 +12,10 @@ var manifest *model.Manifest
 
 const manifestStr = `
 {
-  "id": "com.mattermost.plugin-starter-template",
-  "name": "Plugin Starter Template",
-  "description": "This plugin serves as a starting point for writing a Mattermost plugin.",
-  "version": "0.1.0",
+  "id": "figlet",
+  "name": "FIGlet",
+  "description": "This plugin ransforms provided text by the FIGlet binary and prints it",
+  "version": "0.0.1",
   "min_server_version": "5.12.0",
   "server": {
     "executables": {
@@ -24,9 +24,6 @@ const manifestStr = `
       "windows-amd64": "server/dist/plugin-windows-amd64.exe"
     },
     "executable": ""
-  },
-  "webapp": {
-    "bundle_path": "webapp/dist/main.js"
   },
   "settings_schema": {
     "header": "",
