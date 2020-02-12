@@ -83,7 +83,13 @@ func (f *FIGlet) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 
 func (f FIGlet) transformText(in string) (out string, err error) {
 	s := strings.Fields(in)
-	font := strings.ToLower(s[0])
+	if len(s) < 2 {
+		s := "no additional text provided to transform in '%v'"
+		return "", fmt.Errorf(s, in)
+	}
+	in = strings.Replace(in, "/figlet", "", 1)
+	in = strings.TrimSpace(in)
+	font := strings.ToLower(s[1])
 	var cmd *exec.Cmd
 	if fontNames[font] {
 		s := strings.Replace(in, font, "", 1)
