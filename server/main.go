@@ -54,7 +54,7 @@ func (f *FIGlet) init() error {
 		return fmt.Errorf("could not initialize FIGlet plugin with binary path: %v", err)
 	}
 
-	f.fontsPath, err = filepath.Abs(filepath.Join(bundlePath, "essets", "fonts"))
+	f.fontsPath, err = filepath.Abs(filepath.Join(bundlePath, "assets", "fonts"))
 	if err != nil {
 		return fmt.Errorf("could not initialize FIGlet plugin with fonts path: %v", err)
 	}
