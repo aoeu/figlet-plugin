@@ -1,83 +1,166 @@
-# Plugin Starter Template [![CircleCI branch](https://img.shields.io/circleci/project/github/mattermost/mattermost-plugin-starter-template/master.svg)](https://circleci.com/gh/mattermost/mattermost-plugin-starter-template)
 
-This plugin serves as a starting point for writing a Mattermost plugin. Feel free to base your own plugin off this repository.
-
-To learn more about plugins, see [our plugin documentation](https://developers.mattermost.com/extend/plugins/).
-
-## Getting Started
-Use GitHub's template feature to make a copy of this repository by clicking the "Use this template" button then clone outside of `$GOPATH`.
-
-Alternatively shallow clone the repository to a directory outside of `$GOPATH` matching your plugin name:
-```
-git clone --depth 1 https://github.com/mattermost/mattermost-plugin-starter-template com.example.my-plugin
-```
-
-Note that this project uses [Go modules](https://github.com/golang/go/wiki/Modules). Be sure to locate the project outside of `$GOPATH`, or allow the use of Go modules within your `$GOPATH` with an `export GO111MODULE=on`.
-
-Edit `plugin.json` with your `id`, `name`, and `description`:
-```
-{
-    "id": "com.example.my-plugin",
-    "name": "My Plugin",
-    "description": "A plugin to enhance Mattermost."
-}
-```
-
-Build your plugin:
-```
-make
-```
-
-This will produce a single plugin file (with support for multiple architectures) for upload to your Mattermost server:
+figlet-plugin is a Mattermost plugin for altering text via [FIGlet](https://en.wikipedia.org/wiki/FIGlet).
 
 ```
-dist/com.example.my-plugin.tar.gz
+usage: /figlet [list|help|fonts] [font name] text
 ```
 
-There is a build target to automate deploying and enabling the plugin to your server, but it requires login credentials:
-```
-export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
-export MM_ADMIN_USERNAME=admin
-export MM_ADMIN_PASSWORD=password
-make deploy
-```
 
-or configuration of a [personal access token](https://docs.mattermost.com/developer/personal-access-tokens.html):
-```
-export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
-export MM_ADMIN_TOKEN=j44acwd8obn78cdcx7koid4jkr
-make deploy
-```
+FIGlet is a program for making large letters out of ordinary text
 
-Alternatively, if you are running your `mattermost-server` out of a sibling directory by the same name, use the `deploy` target alone to  unpack the files into the right directory. You will need to restart your server and manually enable your plugin.
+ _ _ _          _   _     _
+| (_) | _____  | |_| |__ (_)___
+| | | |/ / _ \ | __|  _ \| / __|
+| | |   <  __/ | |_| | | | \__ \
+|_|_|_|\_\___|  \__|_| |_|_|___/
 
-In production, deploy and upload your plugin via the [System Console](https://about.mattermost.com/default-plugin-uploads).
 
-## Q&A
+                          .   oooo         o8o
+                        .o8   '888         '"'
+ .ooooo.  oooo d8b    .o888oo  888 .oo.   oooo   .oooo.o
+d88' '88b '888""8P      888    888P"Y88b  '888  d88(  "8
+888   888  888          888    888   888   888  '"Y88b.
+888   888  888          888 .  888   888   888  o.  )88b
+'Y8bod8P' d888b         "888" o888o o888o o888o 8""888P'
 
-### How do I make a server-only or web app-only plugin?
 
-Simply delete the `server` or `webapp` folders and remove the corresponding sections from `plugin.json`. The build scripts will skip the missing portions automatically.
+with the following named fonts:
 
-### How do I include assets in the plugin bundle?
+banner :
 
-Place them into the `assets` directory. To use an asset at runtime, build the path to your asset and open as a regular file:
+#####    ##   #    # #    # ###### #####
+#    #  #  #  ##   # ##   # #      #    #
+#####  #    # # #  # # #  # #####  #    #
+#    # ###### #  # # #  # # #      #####
+#    # #    # #   ## #   ## #      #   #
+#####  #    # #    # #    # ###### #    #
 
-```go
-bundlePath, err := p.API.GetBundlePath()
-if err != nil {
-    return errors.Wrap(err, "failed to get bundle path")
-}
 
-profileImage, err := ioutil.ReadFile(filepath.Join(bundlePath, "assets", "profile_image.png"))
-if err != nil {
-    return errors.Wrap(err, "failed to read profile image")
-}
 
-if appErr := p.API.SetProfileImage(userID, profileImage); appErr != nil {
-    return errors.Wrap(err, "failed to set profile image")
-}
-```
+big :
+ _     _
+| |   (_)
+| |__  _  __ _
+| '_ \| |/ _' |
+| |_) | | (_| |
+|_.__/|_|\__, |
+          __/ |
+         |___/
 
-### How do I build the plugin with unminified JavaScript?
-Use `make debug-dist` and `make debug-deploy` in place of `make dist` and `make deploy` to configure webpack to generate unminified Javascript.
+
+block :
+
+_|        _|                      _|
+_|_|_|    _|    _|_|      _|_|_|  _|  _|
+_|    _|  _|  _|    _|  _|        _|_|
+_|    _|  _|  _|    _|  _|        _|  _|
+_|_|_|    _|    _|_|      _|_|_|  _|    _|
+
+
+
+
+bubble :
+  _   _   _   _   _   _
+ / \ / \ / \ / \ / \ / \
+( b | u | b | b | l | e )
+ \_/ \_/ \_/ \_/ \_/ \_/
+
+
+digital :
++-+-+-+-+-+-+-+
+|d|i|g|i|t|a|l|
++-+-+-+-+-+-+-+
+
+
+ivrit :
+                                                            _   _            _
+                                                           | |_(_)_ ____   _(_)
+                                                           | __| | '__\ \ / / |
+                                                           | |_| | |   \ V /| |
+                                                            \__|_|_|    \_/ |_|
+
+
+
+lean :
+
+    _/
+   _/    _/_/      _/_/_/  _/_/_/
+  _/  _/_/_/_/  _/    _/  _/    _/
+ _/  _/        _/    _/  _/    _/
+_/    _/_/_/    _/_/_/  _/    _/
+
+
+
+
+mini :
+
+._ _ o._ o
+| | ||| ||
+
+
+script :
+
+               o
+ ,   __   ,_        _ _|_
+/ \_/    /  |  |  |/ \_|
+ \/ \___/   |_/|_/|__/ |_/
+                 /|
+                 \|
+
+
+shadow :
+      |               |
+  __| __ \   _' |  _' |  _ \\ \  \   /
+\__ \ | | | (   | (   | (   |\ \  \ /
+____/_| |_|\__,_|\__,_|\___/  \_/\_/
+
+
+
+slant :
+         __            __
+   _____/ /___ _____  / /_
+  / ___/ / __ '/ __ \/ __/
+ (__  ) / /_/ / / / / /_
+/____/_/\__,_/_/ /_/\__/
+
+
+
+small :
+               _ _
+ ____ __  __ _| | |
+(_-< '  \/ _' | | |
+/__/_|_|_\__,_|_|_|
+
+
+
+smscript :
+
+ ,           ,   _   ,_  o    _|_
+/ \_/|/|/|  / \_/   /  | | |/\_|
+ \/  | | |_/ \/ \__/   |/|/|_/ |_/
+                          (|
+
+
+smshadow :
+               |              |
+(_-<  ' \ (_-<   \   _' |  _' |  _ \\ \  \ /
+___/_|_|_|___/_| _|\__,_|\__,_|\___/ \_/\_/
+
+
+
+smslant :
+                 __          __
+  ___ __ _  ___ / /__ ____  / /_
+ (_-</  ' \(_-</ / _ '/ _ \/ __/
+/___/_/_/_/___/_/\_,_/_//_/\__/
+
+
+
+standard :
+     _                  _               _
+ ___| |_ __ _ _ __   __| | __ _ _ __ __| |
+/ __| __/ _' | '_ \ / _' |/ _' | '__/ _' |
+\__ \ || (_| | | | | (_| | (_| | | | (_| |
+|___/\__\__,_|_| |_|\__,_|\__,_|_|  \__,_|
+
+`
