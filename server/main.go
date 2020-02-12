@@ -105,7 +105,7 @@ func (f FIGlet) transformText(in string) (out string, err error) {
 		return "", fmt.Errorf(s, string(b), err)
 	}
 	markdownProof := strings.Replace(string(b), "`", "'", -1)
-	return markdownProof, nil
+	return "```\n" + markdownProof + "```\n", nil
 }
 
 var fontNames = map[string]bool{
