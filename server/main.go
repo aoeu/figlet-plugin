@@ -93,9 +93,10 @@ func (f FIGlet) transformText(in string) (out string, err error) {
 		cmd = exec.Command(f.binaryPath, "-d", f.fontsPath, in)
 	}
 	cmd.Stdin = os.Stdin
-	b, err := cmd.Output()
+	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", fmt.Errorf("could not run and read output of FIGlet: %v", err)
+		s := "error occured when running FIGlet and reading output '%v': %v"
+		return "", fmt.Errorf(s, string(b), err)
 	}
 	return string(b), nil
 }
